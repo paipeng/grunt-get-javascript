@@ -17,7 +17,8 @@ module.exports = function(grunt) {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
       prefix: undefined,
-        offset: 0
+        offset: 0,
+        separator: ""
     });
 
       var htmlparser = require("htmlparser2");
