@@ -22,7 +22,7 @@ module.exports = function(grunt) {
 
       var htmlparser = require("htmlparser2");
 
-      
+
     // Iterate over all specified file groups.
     this.files.forEach(function(f) {
       // Concat specified files.
@@ -76,7 +76,7 @@ module.exports = function(grunt) {
 
         //console.log("end " + js_files);
 
-
+/*
         // for-in loop
         var j = "";
         for (var i in js_files) {
@@ -84,7 +84,8 @@ module.exports = function(grunt) {
 
             j += js_files[i] + "\n";
         }
-        grunt.file.write(f.dest, j);
+        */
+        grunt.file.write(f.dest, JSON.stringify(js_files));
 
       //src += options.punctuation;
 
