@@ -22,12 +22,7 @@ module.exports = function(grunt) {
 
       var htmlparser = require("htmlparser2");
 
-      String.prototype.startsWith = function(s)
-      {
-          if( this.indexOf(s) == 0 ) return true;
-          return false;
-      }
-
+      
     // Iterate over all specified file groups.
     this.files.forEach(function(f) {
       // Concat specified files.
@@ -49,10 +44,10 @@ module.exports = function(grunt) {
 
         var parser = new htmlparser.Parser({
             onopentag: function(name, attribs){
-                if(name === "script"){
+                if(name === "script" && attribs.src !== undefined){
                     if (options.prefix !== undefined) {
-                        if (attribs.src.startsWith(options.prefix)) {
-                            console.log("prefix " + options.prefix);
+                        if (attribs.src.indexOf(options.prefix) == 0) {
+                            //console.log("prefix " + options.prefix);
                             js_files.push(attribs.src);
                         }
                     } else {
