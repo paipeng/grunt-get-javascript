@@ -1,7 +1,7 @@
 {
   "name": "grunt-get-javascript",
   "description": "This plugin is used to get included javascript file names (with path)",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "homepage": "https://github.com/paipeng/grunt-get-javascript",
   "author": {
     "name": "Pai Peng",
