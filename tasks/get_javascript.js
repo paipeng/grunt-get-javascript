@@ -16,9 +16,17 @@ module.exports = function(grunt) {
   grunt.registerMultiTask('get_javascript', 'This plugin is used to get included javascript file names (with path)', function() {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
-      punctuation: '.',
+      prefix: undefined,
       separator: ', '
     });
+
+      var htmlparser = require("htmlparser2");
+
+      String.prototype.startsWith = function(s)
+      {
+          if( this.indexOf(s) == 0 ) return true;
+          return false;
+      }
 
     // Iterate over all specified file groups.
     this.files.forEach(function(f) {
@@ -37,10 +45,56 @@ module.exports = function(grunt) {
       }).join(grunt.util.normalizelf(options.separator));
 
       // Handle options.
-      src += options.punctuation;
+        var js_files = [];
+
+        var parser = new htmlparser.Parser({
+            onopentag: function(name, attribs){
+                if(name === "script"){
+                    if (options.prefix !== undefined) {
+                        if (attribs.src.startsWith(options.prefix)) {
+                            console.log("prefix " + options.prefix);
+                            js_files.push(attribs.src);
+                        }
+                    } else {
+                        js_files.push(attribs.src);
+
+                    }
+
+
+                }
+            },
+            ontext: function(text){
+                //console.log("-->", text);
+            },
+            onclosetag: function(tagname){
+                if(tagname === "script"){
+                    //console.log("That's it?!");
+                    //console.log(js_files);
+                }
+            }
+        });
+//        grunt.log.debug(src);
+
+
+        parser.write(src);
+        parser.end();
+
+        //console.log("end " + js_files);
+
+
+        // for-in loop
+        var j = "";
+        for (var i in js_files) {
+            //console.log(js_files[i]); //"aa", bb", "cc"
+
+            j += js_files[i] + "\n";
+        }
+        grunt.file.write(f.dest, j);
+
+      //src += options.punctuation;
 
       // Write the destination file.
-      grunt.file.write(f.dest, src);
+      //grunt.file.write(f.dest, src);
 
       // Print a success message.
       grunt.log.writeln('File "' + f.dest + '" created.');

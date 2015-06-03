@@ -32,6 +32,7 @@ module.exports = function(grunt) {
     get_javascript: {
       default_options: {
         options: {
+            prefix: '/scripts'
         },
         files: {
           'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
