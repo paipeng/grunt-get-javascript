@@ -46,7 +46,17 @@ module.exports = function(grunt) {
         files: {
           'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
         }
-      }
+      },
+        html_options: {
+            options: {
+                prefix: '/scripts',
+                offset: 1,
+                replace: {selector:'head',html:'<!-- test -->'}
+            },
+            files: {
+                'tmp/index.html': ['test/fixtures/index.html']
+            }
+        }
     },
 
     // Unit tests.
@@ -66,8 +76,8 @@ module.exports = function(grunt) {
 
   // Whenever the "test" task is run, first clean the "tmp" dir, then run this
   // plugin's task(s), then test the result.
-  grunt.registerTask('test', ['clean', 'get_javascript', 'nodeunit']);
-
+  grunt.registerTask('test', ['clean', 'get_javascript']);
+//, 'nodeunit'
   // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'test']);
 

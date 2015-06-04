@@ -8,6 +8,7 @@
 
 'use strict';
 
+var cheerio = require('cheerio');
 module.exports = function(grunt) {
 
   // Please see the Grunt documentation for more information regarding task
@@ -18,8 +19,38 @@ module.exports = function(grunt) {
     var options = this.options({
       prefix: undefined,
         offset: 0,
-        separator: ""
+        separator: "",
+        replace: undefined
     });
+
+      var removeHTMLCode = function(dest, matchArray, replace, $){
+          grunt.log.subhead('Processing ' + dest.cyan);
+
+          matchArray.forEach(function(option) {
+              //console.log("remove " + JSON.stringify(option));
+              if (!option.selector || !option.attribute || !option.value){
+                  grunt.log.error('remove config missing selector, attribute, and/or value options');
+              } else {
+                  $(option.selector).map(function(i,elem){
+                      if ($(elem).attr(option.attribute) === option.value) {
+                          $(elem).remove();
+                      }
+                  });
+              }
+          });
+
+          if (!replace.selector || !replace.html){
+              grunt.log.error('replace config missing selector, attribute, and/or value options');
+          } else {
+              $(replace.selector).append(replace.html);
+          }
+
+          var updatedContents = $.html();
+          grunt.file.write(dest, updatedContents);
+          grunt.log.writeln('File ' + (dest ).cyan + ' created/updated.');
+
+      };
+
 
       var htmlparser = require("htmlparser2");
 
@@ -50,10 +81,10 @@ module.exports = function(grunt) {
                         if (attribs.src.indexOf(options.prefix) == 0) {
                             //console.log("prefix " + options.prefix);
 
-                            js_files.push(attribs.src.substring(options.offset));
+                            js_files.push(attribs.src);
                         }
                     } else {
-                        js_files.push(attribs.src.substring(options.offset));
+                        js_files.push(attribs.src);
 
                     }
 
@@ -70,24 +101,43 @@ module.exports = function(grunt) {
                 }
             }
         });
-//        grunt.log.debug(src);
-
 
         parser.write(src);
         parser.end();
 
-        //console.log("end " + js_files);
 
-/*
-        // for-in loop
-        var j = "";
+        var js_offset_files = [];
+        var matchArray = [];
         for (var i in js_files) {
-            //console.log(js_files[i]); //"aa", bb", "cc"
+            matchArray.push({selector:'script',attribute:'src',value:js_files[i]});
 
-            j += js_files[i] + "\n";
+            js_offset_files.push(js_files[i].substring(options.offset));
         }
-        */
-        grunt.file.write(f.dest, JSON.stringify(js_files));
+
+        // write script filenames into json file
+        grunt.file.write(f.dest, JSON.stringify(js_offset_files));
+
+        if (options.replace !== undefined) {
+
+            f.src.filter(function(filepath) {
+                // Warn on and remove invalid source files (if nonull was set).
+                if (!grunt.file.exists(filepath)) {
+                    grunt.log.warn('Source file "' + filepath + '" not found.');
+                    return false;
+                } else {
+                    return true;
+                }
+            }).map(function(filepath) {
+                // Read file source.
+                var src = grunt.file.read(filepath);
+
+                var $ = cheerio.load(src,{lowerCaseAttributeNames:false});
+                removeHTMLCode(filepath, matchArray, options.replace, $);
+
+            });
+
+
+        }
 
       //src += options.punctuation;
 
