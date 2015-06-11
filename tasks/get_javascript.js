@@ -132,7 +132,7 @@ module.exports = function (grunt) {
             }
 
             // write script filenames into json file
-            grunt.file.write(f.dest, JSON.stringify(js_offset_files));
+            //grunt.file.write(f.dest, JSON.stringify(js_offset_files));
 
             grunt.config.set(options.config_parameter_name, js_offset_files);
 
