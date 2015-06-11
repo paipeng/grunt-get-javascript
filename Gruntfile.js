@@ -8,77 +8,61 @@
 
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
-  // Project configuration.
-  grunt.initConfig({
-    jshint: {
-      all: [
-        'Gruntfile.js',
-        'tasks/*.js',
-        '<%= nodeunit.tests %>'
-      ],
-      options: {
-        jshintrc: '.jshintrc'
-      }
-    },
-
-    // Before generating any new files, remove any previously-created files.
-    clean: {
-      tests: ['tmp']
-    },
-
-    // Configuration to be run (and then tested).
-    get_javascript: {
-      default_options: {
-        options: {
-            prefix: '/scripts'
-        },
-        files: {
-          'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
-        }
-      },
-      custom_options: {
-        options: {
-          separator: ': ',
-          punctuation: ' !!!'
-        },
-        files: {
-          'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
-        }
-      },
-        html_options: {
+    // Project configuration.
+    grunt.initConfig({
+        jshint: {
+            all: [
+                'Gruntfile.js',
+                'tasks/*.js',
+                '<%= nodeunit.tests %>'
+            ],
             options: {
-                prefix: '/scripts',
-                offset: 1,
-                replace: {selector:'head',html:'<!-- test -->'}
-            },
-            files: {
-                'tmp/index.html': ['test/fixtures/index.html']
+                jshintrc: '.jshintrc'
             }
+        },
+
+        // Before generating any new files, remove any previously-created files.
+        clean: {
+            tests: ['tmp']
+        },
+
+        // Configuration to be run (and then tested).
+        get_javascript: {
+            html_options: {
+                options: {
+                    prefix: '/bower_components',
+                    offset: 0,
+                    remove_blank_lines: true,
+                    config_parameter_name: 'js',
+                    replace: {selector: 'head', html: '<!-- js -->'}
+                },
+                files: {
+                    'tmp/html_options': ['test/fixtures/index.html']
+                }
+            }
+        },
+
+        // Unit tests.
+        nodeunit: {
+            tests: ['test/*_test.js']
         }
-    },
+    });
 
-    // Unit tests.
-    nodeunit: {
-      tests: ['test/*_test.js']
-    }
+    // Actually load this plugin's task(s).
+    grunt.loadTasks('tasks');
 
-  });
+    // These plugins provide necessary tasks.
+    grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
-  // Actually load this plugin's task(s).
-  grunt.loadTasks('tasks');
-
-  // These plugins provide necessary tasks.
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
-
-  // Whenever the "test" task is run, first clean the "tmp" dir, then run this
-  // plugin's task(s), then test the result.
-  grunt.registerTask('test', ['clean', 'get_javascript']);
+    // Whenever the "test" task is run, first clean the "tmp" dir, then run this
+    // plugin's task(s), then test the result.
+    grunt.registerTask('test', ['clean', 'get_javascript', 'nodeunit']);
 //, 'nodeunit'
-  // By default, lint and run all tests.
-  grunt.registerTask('default', ['jshint', 'test']);
+    // By default, lint and run all tests.
+    grunt.registerTask('default', ['jshint', 'test']);
 
 };
